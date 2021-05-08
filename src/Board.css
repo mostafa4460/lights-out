@@ -1,3 +1,5 @@
 .Board {
-  margin: 0 auto;
+  margin: 5% auto;
+  width: 700px;
+  height: 700px;
 }

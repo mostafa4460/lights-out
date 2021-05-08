@@ -27,18 +27,25 @@ import "./Board.css";
  *
  **/
 
-function Board({ nrows, ncols, chanceLightStartsOn }) {
+function Board({ nrows=3, ncols=3, chanceLightStartsOn=0.5 }) {
   const [board, setBoard] = useState(createBoard());
 
   /** create a board nrows high/ncols wide, each cell randomly lit or unlit */
   function createBoard() {
     let initialBoard = [];
-    // TODO: create array-of-arrays of true/false values
+
+    for (let y = 0; y < ncols; y++) {
+        initialBoard[y] = [];
+        for(let x = 0; x < nrows; x++) {
+            initialBoard[y].push(Math.random() > chanceLightStartsOn ? true : false);
+        }
+    }
+
     return initialBoard;
   }
 
   function hasWon() {
-    // TODO: check the board in state to determine whether the player has won.
+    return board.every(row => row.every(lit => lit === false));
   }
 
   function flipCellsAround(coord) {
@@ -53,21 +60,45 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
         }
       };
 
-      // TODO: Make a (deep) copy of the oldBoard
+      // Make a (deep) copy of the oldBoard
+      const boardCopy = oldBoard.map(row => row.map(light => light));
 
-      // TODO: in the copy, flip this cell and the cells around it
+      // in the copy, flip this cell and the cells around it
+      flipCell(y, x, boardCopy);
+      flipCell(y-1, x, boardCopy);
+      flipCell(y+1, x, boardCopy);
+      flipCell(y, x-1, boardCopy);
+      flipCell(y, x+1, boardCopy);
 
-      // TODO: return the copy
+      // return the copy
+      return boardCopy;
     });
   }
 
+  let HTML;
   // if the game is won, just show a winning msg & render nothing else
-
-  // TODO
+  if (hasWon()) HTML = <h1>You won!</h1>;
 
   // make table board
+  else HTML = (
+    <table className="Board">
+      <tbody>
+        {board.map((row, rowIndx) => (
+          <tr key={rowIndx}>
+            {row.map((light, lightIndx) => (
+              <Cell 
+                key={`${rowIndx}-${lightIndx}`}
+                isLit={light} 
+                flipCellsAroundMe={() => flipCellsAround(`${rowIndx}-${lightIndx}`)} 
+              />
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 
-  // TODO
+  return HTML;
 }
 
 export default Board;
